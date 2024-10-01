@@ -1,0 +1,45 @@
+#!/bin/bash
+chmod +x "$0"  # Define permissões de execução para o script
+
+# Instalador do N8N, PostgreSQL e Redis em Docker
+# Autor: Autotic
+# Versao: latest
+
+clear
+echo "INICIANDO SETUP DO N8N, POSTGRES E REDIS..."
+sleep 5
+clear
+
+# Atualiza o sistema
+sudo apt -y update && sudo apt -y upgrade
+
+# Verifica se o Docker está instalado
+if ! command -v docker &> /dev/null; then
+    echo "Instalando o Docker..."
+    sudo apt install -y docker.io
+else
+    echo "Docker já está instalado."
+fi
+
+# Adiciona o usuário atual ao grupo docker
+sudo usermod -aG docker $USER
+
+# Executa o PostgreSQL
+sudo docker run -d --name postgres-n8n -e POSTGRES_USER=n8n -e POSTGRES_PASSWORD=senha_segura -e POSTGRES_DB=n8n -p 5432:5432 postgres:latest
+
+# Executa o Redis
+sudo docker run -d --name redis-n8n -p 6379:6379 redis:latest
+
+# Executa o N8N, conectando ao PostgreSQL e Redis
+sudo docker run -d --restart unless-stopped --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n:latest \
+  --database.postgres.host=postgres-n8n \
+  --database.postgres.user=n8n \
+  --database.postgres.password=senha_segura \
+  --database.postgres.database=n8n \
+  --redis.host=redis-n8n
+
+host=$(hostname -I | head -n1 | cut -d " " -f1)
+clear
+echo "N8N, POSTGRES E REDIS INSTALADOS COM SUCESSO!"
+echo "Acesse a URL: http://${host}:5678"
+echo ""
