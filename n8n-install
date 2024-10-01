@@ -34,7 +34,7 @@ sudo docker run -d --name redis-n8n -p 6379:6379 redis:latest
 sudo docker run -d --restart unless-stopped --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n:latest \
   --database.postgres.host=postgres-n8n \
   --database.postgres.user=n8n \
-  --database.postgres.password=senha_segura \
+  --database.postgres.password=F-4d9SE9YcE<|vv;>";N \
   --database.postgres.database=n8n \
   --redis.host=redis-n8n
 
